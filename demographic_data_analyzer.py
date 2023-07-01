@@ -7,7 +7,7 @@ def calculate_demographic_data(print_data=True):
     df.head()
 
     # How many of each race are represented in this dataset? This should be a Pandas series with race names as the index labels.
-    race_count = df['race'].value_count()
+    race_count = df['race'].value_counts()
   
     #create a data set of
     men_set = df[df['sex']=='Male']
@@ -35,12 +35,15 @@ def calculate_demographic_data(print_data=True):
 
     # What percentage of the people who work the minimum number of hours per week have a salary of >50K?
     num_min_workers = df[df['hours-per-week']==min_work_hours].shape[0]
-    rich_min_workers = df[df['hours-per-week']==min_work_hours & df['salary']=='>50K'].shape[0]
+    rich_min_workers = df[(df['hours-per-week']==min_work_hours) & (df['salary']=='>50K')].shape[0]
     rich_percentage = round((rich_min_workers/num_min_workers)*100, 1)
 
     # What country has the highest percentage of people that earn >50K?
-    highest_earning_country = df[df['salary'] == '>50K']['native-country'].value_counts(normalize=True).idxmax()
-    highest_earning_country_percentage = round(((df[(df['native-country'] == highest_earning_country) & (df['salary'] == '>50K')].shape[0] / df[df['native-country'] == highest_earning_country].shape[0]) * 100),1)
+    sort_highest_earning = df[df['salary'] == '>50K']['native-country'].value_counts()
+    country_pop = df['native-country'].value_counts()
+    country_percentages = (sort_highest_earning/country_pop)*100
+    highest_earning_country = country_percentages.idxmax()
+    highest_earning_country_percentage = round(country_percentages.max())
 
     # Identify the most popular occupation for those who earn >50K in India.
     top_IN_occupation = df[(df['native-country'] == 'India') & (df['salary'] == '>50K')]['occupation'].value_counts().idxmax()
